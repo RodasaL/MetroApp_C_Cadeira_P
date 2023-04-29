@@ -1,0 +1,25 @@
+Linha nada
+paragem0 #Z000
+
+Linha Secundaria
+Parque da Cidade2 #P000
+Ponte #P03
+Ferrovia #P073
+Casa do Mel #F514
+Coimbra-D #Z1323
+
+Linha Alta
+Parque do Roubo #L331
+Viaduto #P003
+Paragem #J973
+Flores #A544
+Zona Alta #V423
+Aviario #U221
+
+Linha da Baixa
+Parque da Cidade #P011
+Portagem #P09
+Loja do Cidadao #P013
+Casa do Sal #F554
+Coimbra-B #H123
+

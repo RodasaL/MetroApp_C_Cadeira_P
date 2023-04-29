@@ -1,0 +1,1 @@
+void adicionar_paragem(Sistema *sistema, char *nome_paragem, int indicadorlinha) {
