@@ -134,7 +134,7 @@ void adicionar_linhaUinput(Sistema *sistema){
     }
     }
 }
-void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem) {
+void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem, Paragem *paragens) {
       int indicadorlinha=sistema->num_linhas;
      --indicadorlinha;
     if (indicadorlinha < 0 ) {
@@ -180,7 +180,7 @@ void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *
         // erro ao alocar memória
         exit(1);
     }
-    // aloca memória para a nova string com o nome da paragem
+    // aloca memória para a nova string com o cod da paragem
     linha->codigo[linha->num_paragens] = malloc((strlen(codigo_paragem) + 1) * sizeof(char));
     if (linha->paragens[linha->num_paragens] == NULL) {
         // erro ao alocar memória
@@ -193,7 +193,56 @@ void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *
     // atualiza o número de paragens da linha
     linha->num_paragens++;
     sistema->Snumparagens++;
-  
+  //------------------------Vou guardar também na struct Paragens para depois poder usar na lista ligada----------------//
+
+    if (paragens->nomep == NULL || paragens->num_paragensp == 0) {
+    printf("Paragens era Null\n");
+        paragens->nomep = malloc(sizeof(char *));
+        paragens->codigop=malloc(sizeof(char *));
+        if (paragens->nomep == NULL || paragens->codigop == NULL) {
+            // erro ao alocar memória
+        printf("Erro a alocar memoria do tamanho do ponteiro no adicionaparagemutilizador\n");
+        exit(1);
+        }
+        
+    }
+    else {
+        printf("Paragens nao era Null\n");
+        paragens->nomep = realloc(paragens->nomep, (paragens->num_paragensp + 1) * sizeof(char *));
+        paragens->codigop = realloc(paragens->codigop,(paragens->num_paragensp + 1)* sizeof(char *));
+        printf("Estranho\n");
+        if (paragens->nomep == NULL || paragens->codigop == NULL) {
+            // erro ao alocar memória
+            printf("Erro a realocar memoria do tamanho do ponteiro no adicionaparagemutilizador\n");
+            exit(1);
+        }
+    }
+    
+
+    printf("siga\n");
+// aloca memória para a nova string com o nome da paragem
+paragens->nomep[paragens->num_paragensp] = malloc((strlen(nome_paragem) + 1) * sizeof(char));
+if (paragens->nomep[paragens->num_paragensp] == NULL) {
+    // erro ao alocar memória
+    printf("Erro a alocar memoria para a nova string no adicionaparagemutilizador\n");
+    exit(1);
+}
+
+// copia o nome da paragem para a nova string
+strcpy(paragens->nomep[paragens->num_paragensp], nome_paragem);
+
+ paragens->codigop[paragens->num_paragensp]= malloc((strlen(codigo_paragem)+ 1) * sizeof(char));
+ if (paragens->codigop[paragens->num_paragensp] == NULL) {
+    // erro ao alocar memória
+    printf("Erro a alocar memoria para a nova string codigo no adicionaparagemutilizador\n");
+    exit(1);
+}
+strcpy(paragens->codigop[paragens->num_paragensp], codigo_paragem);
+// atualiza o número de paragens da estrutura
+paragens->num_paragensp++;
+
+
+
     
 }
 void adicionaparagemutilizador(Paragem *paragens){
@@ -202,7 +251,7 @@ void adicionaparagemutilizador(Paragem *paragens){
     printf("Introduza o nome da paragem\n");
     scanf("%s",Nnome);
     
-  if (paragens->nomep == NULL) {
+  if (paragens->nomep == NULL || paragens->num_paragensp == 0) {
     printf("Paragens era Null\n");
         paragens->nomep = malloc(sizeof(char *));
         paragens->codigop=malloc(sizeof(char *));
@@ -251,7 +300,7 @@ strcpy(paragens->codigop[paragens->num_paragensp], cod);
 paragens->num_paragensp++;
 
 }
-void adicionalinhadoc(Sistema *sistema){
+void adicionalinhadoc(Sistema *sistema,Paragem *paragens){
     char ficheiro[20],  linha123[264];
     char *extensao;
     int flag1 = 0;    
@@ -295,7 +344,7 @@ void adicionalinhadoc(Sistema *sistema){
                 --indicador;
                 Linha *linha = (&sistema->linhas[indicador]);
                 printf("Vou enviar a paragem\n");
-                adicionar_paragem(sistema,linha, nome_paragem, codigo);//falta guardar o codigo
+                adicionar_paragem(sistema,linha, nome_paragem, codigo,paragens);//falta guardar o codigo
                 
                 printf("Paragens da Linha-> [-%s-]\n",linha->nome);
                 printf("Numero de paragens da linha ->%d\n",linha->num_paragens);
@@ -332,7 +381,9 @@ void printaparagens(Sistema *sistema){
 void printaparagensU(Paragem *paragens){
     printf("Paragens do utilizador:\n");
     for (int u=0; u < paragens->num_paragensp; u++){
+        if(paragens->codigop[u][0] == 'U'){
         printf("->%s %s\n",paragens->nomep[u], paragens->codigop[u]);
+        }
     }
 }
 
@@ -372,7 +423,7 @@ void removerparagens(Paragem *paragens){
         }
     }
 }
-
+/*
 Paragem *encontrar_paragem(Sistema *sistema, char *nome_paragem) {
     for (int i = 0; i < sistema->Snumparagens; i++) {
         if (strcmp(sistema->paragens[i].nomep, nome_paragem) == 0) {
@@ -380,8 +431,9 @@ Paragem *encontrar_paragem(Sistema *sistema, char *nome_paragem) {
         }
     }
     return NULL;
-}//parece estar tudo ok falta reduzir o num de paragens no int do sistema quando as removo 
-
+}
+//O stress aqui é que quando adiciono as paragens as linhas devo tambem guardar os nomes das paragens 
+//para ter onde dps ir comparalas dai querer compara com a struct paragem e o nomep
 int linha_tem_paragem(Linha *linha, char *nome_paragem) {
     for (int i = 0; i < linha->num_paragens; i++) {
         if (strcmp(linha->paragens[i], nome_paragem) == 0) {
@@ -422,6 +474,41 @@ NoParagem* obter_paragens_da_linha(Sistema *sistema, char *nome_linha) {
     }
     return NULL;
 }
+*/
+
+
+
+   void libertar_sistema(Sistema *sistema, Paragem *paragens) {
+    
+    for (int i = 0; i < sistema->num_linhas; i++) {
+        Linha *linha = (&sistema->linhas[i]);
+        printf("\nteste do nome da linha->%s_free\n",linha->nome);
+        free(linha->nome);
+        
+         printf("---------------------------\n");
+        for(int l = 0; l < linha->num_paragens;l++){
+        free(linha->paragens[l]);
+        free(linha->codigo[l]);
+        }
+        printf("---------------------------\n");
+        printf(" pos free_1 ->%s\n",linha->nome);
+        
+    }
+    free(sistema->linhas);
+    for(int x = 0; x < paragens->num_paragensp; x++){
+        free(paragens->nomep[x]);
+        free(paragens->codigop[x]);
+    }
+    free(sistema->paragens);
+
+    free(sistema);
+    
+}
+
+
+
+
+
 
 int menu(Sistema *sistema, Paragem *paragens){
     int opcao;
@@ -450,7 +537,7 @@ int menu(Sistema *sistema, Paragem *paragens){
          break;
       case 4:
          printf("Opcao 4 selecionada\n");
-         adicionalinhadoc(sistema);
+         adicionalinhadoc(sistema, paragens);
          break;
       case 5:
          printf("Opcao 5 selecionada\n");
@@ -461,6 +548,7 @@ int menu(Sistema *sistema, Paragem *paragens){
          break;
          case 7:
             printf("Opcao 7 selecionada\n");
+            libertar_sistema(sistema, paragens);
             printf("Adeus!\n");
             flag2=0;
             break;
@@ -472,18 +560,4 @@ int menu(Sistema *sistema, Paragem *paragens){
 }
 
 
-int leficheiro(){;}
-/*
-   void libertar_sistema(Sistema *sistema) {
-    for (int i = 0; i < sistema->Snum_paragens; i++) {
-        free(sistema->paragens[i].nome);
-    }
-    free(sistema->paragens);
 
-    for (int i = 0; i < sistema->num_linhas; i++) {
-        free(sistema->linhas[i].nome);
-        free(sistema->linhas[i].paragens);
-    }
-    free(sistema->linhas);
-}
-*/

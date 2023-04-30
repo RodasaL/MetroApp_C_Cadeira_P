@@ -26,7 +26,7 @@ int main() {
      paragens->num_paragensp =0;
      sistema->num_linhas = 0;
      sistema->Snumparagens = 0;
-    adicionalinhadoc(sistema);
+    adicionalinhadoc(sistema,paragens);
     printf("teste->%s\n",sistema->linhas[0].nome);
     printf("teste2 ->%s\n",sistema->linhas[0].paragens[0]);
     while (flag2==1){

@@ -6,12 +6,12 @@
 
 int menu(Sistema *sistema, Paragem *paragens);
 int leficheiro();
-void libertar_sistema(Sistema *sistema);
+void libertar_sistema(Sistema *sistema, Paragem *paragens );
 void printalinhas(Sistema *sistema);
-void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem);
+void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem, Paragem *paragens);
 void adicionar_linha(Sistema *sistema, char *nome_linha);
 void printaparagens(Sistema *sistema);
 void printaparagensU(Paragem *paragens);
 void adicionaparagemutilizador(Paragem *paragens);
 void removerparagens(Paragem *paragens);
-void adicionalinhadoc(Sistema *sistema);
+void adicionalinhadoc(Sistema *sistema, Paragem *paragens);
