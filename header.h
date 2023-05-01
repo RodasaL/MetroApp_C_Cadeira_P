@@ -5,7 +5,6 @@
 #include <time.h>
 
 int menu(Sistema *sistema, Paragem *paragens);
-int leficheiro();
 void libertar_sistema(Sistema *sistema, Paragem *paragens );
 void printalinhas(Sistema *sistema);
 void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem, Paragem *paragens);
