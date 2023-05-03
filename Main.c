@@ -29,9 +29,10 @@ int main() {
     adicionalinhadoc(sistema,paragens);
     printf("teste->%s\n",sistema->linhas[0].nome);
     printf("teste2 ->%s\n",sistema->linhas[0].paragens[0]);
+    NoLinha* lista_linhas =inicializar_lista(sistema);
     while (flag2==1){
     printf("Bem vindo!\n");
-    menu(sistema, paragens);
+    menu(sistema, paragens, lista_linhas);
    
 
 }

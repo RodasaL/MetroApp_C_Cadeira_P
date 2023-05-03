@@ -15,6 +15,11 @@ typedef struct{
     char **codigop;
     int num_paragensp;
 }Paragem;
+typedef struct{
+    char *nomep;
+    char **codigop;
+    int num_paragensp;
+}Paragem2;
 
 typedef struct 
 {
@@ -43,7 +48,6 @@ typedef struct NoLinha {
 
 typedef struct NoPercurso {
     Linha *linha;
-    NoParagem *paragens;
     struct NoPercurso *prox;
 } NoPercurso;
 
@@ -95,7 +99,7 @@ void adicionar_linhaUinput(Sistema *sistema){
     scanf("%s",nomedalinha);
     testelinha=strstr(nomedalinha,"Linha");
     if (testelinha == NULL){
-        printf("O nome da linha tem de ser iniciado por 'Linha'\n");//testes de seguranca em falta
+        printf("O nome da linha tem de ser iniciado por 'Linha'\n");//testes de seguranca em falta TODO:
          printf("Introduza o nome da linha (Nome: 'Linha Central'):%s\n");
         scanf("%s",nomedalinha);
     }
@@ -137,6 +141,7 @@ void adicionar_linhaUinput(Sistema *sistema){
 void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem, Paragem *paragens) {
       int indicadorlinha=sistema->num_linhas;
      --indicadorlinha;
+     //Falta comparar com as paragens já existentes não quero nomes iguais nem cods TODO:
     if (indicadorlinha < 0 ) {
         printf("Indice de linha invalido!\n");
         return;
@@ -250,7 +255,7 @@ void adicionaparagemutilizador(Paragem *paragens){
     char cod[6];
     printf("Introduza o nome da paragem\n");
     scanf("%s",Nnome);
-    
+    //Falta comparar com as paragens já existentes não quero nomes iguais TODO:
   if (paragens->nomep == NULL || paragens->num_paragensp == 0) {
     printf("Paragens era Null\n");
         paragens->nomep = malloc(sizeof(char *));
@@ -423,6 +428,8 @@ void removerparagens(Paragem *paragens){
         }
     }
 }
+//FIXME:
+
 /*
 Paragem *encontrar_paragem(Sistema *sistema, char *nome_paragem) {
     for (int i = 0; i < sistema->Snumparagens; i++) {
@@ -474,15 +481,156 @@ NoParagem* obter_paragens_da_linha(Sistema *sistema, char *nome_linha) {
     }
     return NULL;
 }
+
+
+NoPercurso* calcular_percursos(Sistema *sistema, char* nome_partida, char* nome_chegada) {
+
+    // Inicializar a lista ligada de percursos
+    NoPercurso *lista_percursos = NULL;
+
+    // Encontrar a paragem de partida
+    Paragem *partida = encontrar_paragem(sistema, nome_partida);//Não quero usar a estrutura paragem
+    if (partida == NULL) {
+        printf("Paragem de partida nao encontrada!\n");
+        return NULL;
+    }
+
+    // Encontrar a paragem de chegada
+    Paragem *chegada = encontrar_paragem(sistema, nome_chegada);//Não quero usar a estrutura paragem
+    if (chegada == NULL) {
+        printf("Paragem de chegada nao encontrada!\n");
+        return NULL;
+    }
+
+    // Para cada linha que contém a paragem de partida, verificamos se também contém
+    // a paragem de chegada. Se sim, adicionamos o percurso na lista ligada de percursos.
+    for (int i = 0; i < sistema->num_linhas; i++) {
+        Linha linha_partida = sistema->linhas[i];
+        if (linha_tem_paragem(linha_partida, nome_partida)) {
+            for (int j = 0; j < sistema->num_linhas; j++) {
+                Linha linha_chegada = sistema->linhas[j];
+                if (linha_tem_paragem(linha_chegada, nome_chegada)) {
+
+                    // Se as paragens de partida e chegada estão na mesma linha, adicionamos
+                    // um percurso com apenas uma linha
+                    if (linha_partida.nome == linha_chegada.nome) {
+                        Percurso *percurso = criar_percurso(&linha_partida, partida, chegada);
+                        adicionar_percurso_lista(&lista_percursos, percurso);
+                    }
+
+                    // Se as paragens de partida e chegada estão em linhas diferentes, procuramos
+                    // uma paragem de transbordo e adicionamos um percurso com duas linhas
+                    else {
+                        Paragem *transbordo = encontrar_paragem_transbordo(&linha_partida, &linha_chegada);
+                        if (transbordo != NULL) {
+                            Percurso *percurso1 = criar_percurso(&linha_partida, partida, transbordo);
+                            Percurso *percurso2 = criar_percurso(&linha_chegada, transbordo, chegada);
+                            adicionar_percurso_lista(&lista_percursos, percurso1);
+                            adicionar_percurso_lista(&lista_percursos, percurso2);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Retornar a lista de percursos encontrados
+    return lista_percursos;
+}
 */
+//Lista ligada para as estruturas linha cada no representa uma estrutura 
+NoLinha* inicializar_lista(Sistema *sistema){
+    NoLinha *iniciolista = NULL; // inicializa o início da lista como nulo
 
+for (int i = sistema->num_linhas - 1; i >= 0; i--) {
+    Linha *linha = &sistema->linhas[i]; // obtém as linhas
+    NoLinha *novo_no = malloc(sizeof(NoLinha)); // aloca memória para o novo nó
+    novo_no->linha = linha; // atribui a linha ao novo nó
 
+    // insere o novo nó no início da lista
+    novo_no->prox = iniciolista;
+    iniciolista = novo_no;
+    
+}
+return iniciolista;
+}
+void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
+    
+    NoLinha *no = lista_linhas;
+    int encontrou_percurso = 0;
 
-   void libertar_sistema(Sistema *sistema, Paragem *paragens) {
+    while (no != NULL) {
+        Linha *linha = no->linha;
+
+        // Procurar a paragem de partida na linha atual
+        int encontrou_partida = 0;
+        int i;
+        printf("Linha em estudo: [%s]\n",linha->nome);
+        for (i = 0; i < linha->num_paragens; i++) {
+            printf("Vou comparar : %s com : %s\n",linha->paragens[i], partida);
+            if (strcmp(linha->paragens[i], partida) == 0) {
+                encontrou_partida = 1;
+                break;
+            }
+        }
+
+        // Se não encontrou a paragem de partida, passar à próxima linha
+        if (!encontrou_partida) {
+            no = no->prox;
+            continue;
+        }
+
+        // Procurar a paragem de chegada na linha atual, a partir da paragem de partida
+        int encontrou_chegada = 0;
+        printf("Linha em estudo: [%s]\n",linha->nome);
+        for (; i < linha->num_paragens; i++) {
+             printf("Vou comparar : %s com : %s\n",linha->paragens[i], chegada);
+            if (strcmp(linha->paragens[i], chegada) == 0) {
+                printf("Encontrei\n");
+                encontrou_chegada = 1;
+                break;
+            }
+        }
+
+        // Se não encontrou a paragem de chegada, passar à próxima linha
+        if (!encontrou_chegada) {
+            no = no->prox;
+            continue;
+        }
+
+        // Encontrou o percurso
+        encontrou_percurso = 1;
+        printf("Linha %s: ", linha->nome);
+        for (int j = i; j >= 0; j--) {
+            printf("%s", linha->paragens[j]);
+            if (j > 0) {
+                printf(" -> ");
+            }
+        }
+        printf("\n");
+
+        // Passar à próxima linha para verificar se há outros percursos possíveis
+        no = no->prox;
+    }
+
+    // Se não encontrou percurso, mostrar mensagem
+    if (!encontrou_percurso) {
+        printf("Nao foi encontrado percurso entre %s e %s.\n", partida, chegada);
+    }
+}
+
+   void libertar_sistema(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas) {
+     NoLinha *atual = lista_linhas;
+    while (atual != NULL) {
+        NoLinha *prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
     
     for (int i = 0; i < sistema->num_linhas; i++) {
         Linha *linha = (&sistema->linhas[i]);
-        printf("\nteste do nome da linha->%s_free\n",linha->nome);
+       
         free(linha->nome);
         
          printf("---------------------------\n");
@@ -490,8 +638,7 @@ NoParagem* obter_paragens_da_linha(Sistema *sistema, char *nome_linha) {
         free(linha->paragens[l]);
         free(linha->codigo[l]);
         }
-        printf("---------------------------\n");
-        printf(" pos free_1 ->%s\n",linha->nome);
+        
         
     }
     free(sistema->linhas);
@@ -503,14 +650,14 @@ NoParagem* obter_paragens_da_linha(Sistema *sistema, char *nome_linha) {
 
     free(sistema);
     
-}
+   }
 
 
 
 
 
 
-int menu(Sistema *sistema, Paragem *paragens){
+int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
     int opcao;
     printf("---Menu---\n");
     printf("1-->Registar Paragem\n");
@@ -519,7 +666,8 @@ int menu(Sistema *sistema, Paragem *paragens){
     printf("4-->Adcionar Linhas\n");
     printf("5-->Atualizar Linha\n");
     printf("6-->Visualizar Linhas\n");
-    printf("7-->Sair do Programa\n");
+    printf("7-->Percurso teste\n");
+    printf("8-->Sair do Programa\n");
     scanf("%d",&opcao);
        switch(opcao) {
       case 1:
@@ -546,9 +694,34 @@ int menu(Sistema *sistema, Paragem *paragens){
          printf("Opcao 6 selecionada\n");
          printalinhas(sistema);
          break;
-         case 7:
-            printf("Opcao 7 selecionada\n");
-            libertar_sistema(sistema, paragens);
+      case 7:
+         printf("Opcao 7 selecionada\n");
+         char paragem_incio[246],paragem_fim[246];
+         printf("As paragens disponiveis sao:\n");
+         printf("--------------\n");
+          //printaparagens(sistema);
+          printf("--------------\n");
+         //printaparagensU(paragens);
+         printf("--------------\n");
+         printf("Introduza as paragens que deseja incluir no seu percurso:\n");
+         while (getchar() != '\n');
+         printf("Paragem de Partida: \n");
+         fflush(stdout);
+         fgets(paragem_incio, sizeof(paragem_incio), stdin);
+         paragem_incio[strcspn(paragem_incio, "\n")] = '\0'; // remove o caractere de nova linha
+
+         printf("Paragem Destino: \n");
+         fflush(stdout);
+         fgets(paragem_fim, sizeof(paragem_fim), stdin);
+         paragem_fim[strcspn(paragem_fim, "\n")] = '\0'; // remove o caractere de nova linha
+
+
+         
+         encontrar_percurso(lista_linhas,paragem_incio,paragem_fim);
+         break;
+      case 8:
+            printf("Opcao 8 selecionada\n");
+            libertar_sistema(sistema, paragens, lista_linhas);
             printf("Adeus!\n");
             flag2=0;
             break;
