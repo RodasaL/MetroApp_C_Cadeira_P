@@ -14,7 +14,7 @@ Viaduto #P003
 Paragem #J973
 Flores #A544
 Zona Alta #V423
-Aviario #I221
+aviario #I221
 
 Linha da Baixa
 Parque da Cidade #P011

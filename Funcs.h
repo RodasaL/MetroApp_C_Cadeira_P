@@ -696,7 +696,7 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          break;
       case 7:
          printf("Opcao 7 selecionada\n");
-         char paragem_incio[246],paragem_fim[246];
+         char paragem_incio[50],paragem_fim[50];
          printf("As paragens disponiveis sao:\n");
          printf("--------------\n");
           //printaparagens(sistema);
@@ -705,19 +705,35 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          printf("--------------\n");
          printf("Introduza as paragens que deseja incluir no seu percurso:\n");
          while (getchar() != '\n');
-         printf("Paragem de Partida: \n");
-         fflush(stdout);
-         fgets(paragem_incio, sizeof(paragem_incio), stdin);
-         paragem_incio[strcspn(paragem_incio, "\n")] = '\0'; // remove o caractere de nova linha
+        // printf("Paragem de Partida: \n");
+        // fflush(stdout);
+        // fgets(paragem_incio, sizeof(paragem_incio), stdin);
+          // remove o caractere de nova linha
 
          printf("Paragem Destino: \n");
          fflush(stdout);
          fgets(paragem_fim, sizeof(paragem_fim), stdin);
          paragem_fim[strcspn(paragem_fim, "\n")] = '\0'; // remove o caractere de nova linha
-
-
-         
-         encontrar_percurso(lista_linhas,paragem_incio,paragem_fim);
+        NoLinha *no = lista_linhas;
+        while (no != NULL) {
+        Linha *linha = no->linha;
+          printf("Linha em estudo: [%s]\n",linha->nome);
+          int encontrou_chegada_teste = 0;
+          strcpy(paragem_incio, "aviario ");//FIXME: ok o problema esta que quando vou buscar a paragem ao inicio do inicio em linha123 esta a apanhar ' '
+         for (int i = 0; i < linha->num_paragens; i++) {//assim já funciona lol dps resolvo
+            printf("Vou comparar : %s com : %s\n",linha->paragens[i], paragem_incio);
+            if (strcmp(linha->paragens[i], paragem_incio) == 0) {
+                printf("WOW a paragem da linha-> [%s] e igual a paragem inicio -> (%s)\n",linha->paragens[i],paragem_incio);
+                encontrou_chegada_teste = 1;
+                break;
+            }
+        }
+           if (!encontrou_chegada_teste) {
+            no = no->prox;
+            continue;
+        }
+        }
+         //encontrar_percurso(lista_linhas,paragem_incio,paragem_fim);
          break;
       case 8:
             printf("Opcao 8 selecionada\n");
