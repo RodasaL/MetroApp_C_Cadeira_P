@@ -343,8 +343,11 @@ void adicionalinhadoc(Sistema *sistema,Paragem *paragens){
             } else { // paragem       
                 printf("Paragem time\n");         
                 char nome_paragem[MAX_NOME_PARAGEM], codigo[MAX_CODIGO_PARAGEM];
-                sscanf(linha123, "%[^#] #%s", nome_paragem, codigo);
-                printf("Codigo:%s\n",codigo);
+                 sscanf(linha123, " %[^#] #%s ", nome_paragem, codigo);
+                  int tamanho= strlen(nome_paragem);
+                  nome_paragem[tamanho-1]='\0';
+                printf("Nome da paragem-> :%s:\n", nome_paragem);
+                printf("Código-> :%s:\n", codigo);
                 int indicador=sistema->num_linhas;
                 --indicador;
                 Linha *linha = (&sistema->linhas[indicador]);
@@ -558,15 +561,17 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
     
     NoLinha *no = lista_linhas;
     int encontrou_percurso = 0;
-
+    char linha[40], paragem[40];
     while (no != NULL) {
         Linha *linha = no->linha;
 
         // Procurar a paragem de partida na linha atual
         int encontrou_partida = 0;
-        int i;
+        int i, d;
         printf("Linha em estudo: [%s]\n",linha->nome);
         for (i = 0; i < linha->num_paragens; i++) {
+           // strcpy(linha,linha->paragens[i]);
+           // strcpy(paragem,partida); temp vars para dps fazer um upper para comparar 
             printf("Vou comparar : %s com : %s\n",linha->paragens[i], partida);
             if (strcmp(linha->paragens[i], partida) == 0) {
                 encontrou_partida = 1;
@@ -583,9 +588,9 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
         // Procurar a paragem de chegada na linha atual, a partir da paragem de partida
         int encontrou_chegada = 0;
         printf("Linha em estudo: [%s]\n",linha->nome);
-        for (; i < linha->num_paragens; i++) {
-             printf("Vou comparar : %s com : %s\n",linha->paragens[i], chegada);
-            if (strcmp(linha->paragens[i], chegada) == 0) {
+        for ( d = i; d < linha->num_paragens; d++) {
+             printf("Vou comparar : %s com : %s\n",linha->paragens[d], chegada);
+            if (strcmp(linha->paragens[d], chegada) == 0) {
                 printf("Encontrei\n");
                 encontrou_chegada = 1;
                 break;
@@ -601,9 +606,9 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
         // Encontrou o percurso
         encontrou_percurso = 1;
         printf("Linha %s: ", linha->nome);
-        for (int j = i; j >= 0; j--) {
+        for (int j = i; j <=d; j++) {
             printf("%s", linha->paragens[j]);
-            if (j > 0) {
+            if (j < d) {
                 printf(" -> ");
             }
         }
@@ -705,35 +710,18 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          printf("--------------\n");
          printf("Introduza as paragens que deseja incluir no seu percurso:\n");
          while (getchar() != '\n');
-        // printf("Paragem de Partida: \n");
-        // fflush(stdout);
-        // fgets(paragem_incio, sizeof(paragem_incio), stdin);
+         printf("Paragem de Partida: \n");
+         fflush(stdout);
+         fgets(paragem_incio, sizeof(paragem_incio), stdin);
           // remove o caractere de nova linha
-
+         paragem_incio[strcspn(paragem_incio, "\n")] = '\0'; 
          printf("Paragem Destino: \n");
          fflush(stdout);
          fgets(paragem_fim, sizeof(paragem_fim), stdin);
          paragem_fim[strcspn(paragem_fim, "\n")] = '\0'; // remove o caractere de nova linha
-        NoLinha *no = lista_linhas;
-        while (no != NULL) {
-        Linha *linha = no->linha;
-          printf("Linha em estudo: [%s]\n",linha->nome);
-          int encontrou_chegada_teste = 0;
-          strcpy(paragem_incio, "aviario ");//FIXME: ok o problema esta que quando vou buscar a paragem ao inicio do inicio em linha123 esta a apanhar ' '
-         for (int i = 0; i < linha->num_paragens; i++) {//assim já funciona lol dps resolvo
-            printf("Vou comparar : %s com : %s\n",linha->paragens[i], paragem_incio);
-            if (strcmp(linha->paragens[i], paragem_incio) == 0) {
-                printf("WOW a paragem da linha-> [%s] e igual a paragem inicio -> (%s)\n",linha->paragens[i],paragem_incio);
-                encontrou_chegada_teste = 1;
-                break;
-            }
-        }
-           if (!encontrou_chegada_teste) {
-            no = no->prox;
-            continue;
-        }
-        }
-         //encontrar_percurso(lista_linhas,paragem_incio,paragem_fim);
+       
+    
+         encontrar_percurso(lista_linhas,paragem_incio,paragem_fim);
          break;
       case 8:
             printf("Opcao 8 selecionada\n");
