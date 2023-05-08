@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <time.h>
 #define MLEN 128
 #define MAX_NOME_LINHA 50
@@ -541,6 +542,12 @@ NoPercurso* calcular_percursos(Sistema *sistema, char* nome_partida, char* nome_
     return lista_percursos;
 }
 */
+void Upper(char *str) {
+    for (int i = 0; i < strlen(str); i++) {
+        str[i] = toupper(str[i]);
+    }
+}
+
 //Lista ligada para as estruturas linha cada no representa uma estrutura 
 NoLinha* inicializar_lista(Sistema *sistema){
     NoLinha *iniciolista = NULL; // inicializa o início da lista como nulo
@@ -561,19 +568,21 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
     
     NoLinha *no = lista_linhas;
     int encontrou_percurso = 0;
-    char linha[40], paragem[40];
+    char templinha[40], tempparagem[40];
     while (no != NULL) {
         Linha *linha = no->linha;
 
         // Procurar a paragem de partida na linha atual
         int encontrou_partida = 0;
         int i, d;
-        printf("Linha em estudo: [%s]\n",linha->nome);
+        //printf("Linha em estudo: [%s]\n",linha->nome);
         for (i = 0; i < linha->num_paragens; i++) {
-           // strcpy(linha,linha->paragens[i]);
-           // strcpy(paragem,partida); temp vars para dps fazer um upper para comparar 
-            printf("Vou comparar : %s com : %s\n",linha->paragens[i], partida);
-            if (strcmp(linha->paragens[i], partida) == 0) {
+            strcpy(templinha,linha->paragens[i]);
+            Upper(templinha);
+            strcpy(tempparagem,partida);
+            Upper(tempparagem);  
+            //printf("Vou comparar : %s com : %s\n",templinha,tempparagem);
+            if (strcmp(templinha,tempparagem) == 0) {
                 encontrou_partida = 1;
                 break;
             }
@@ -587,11 +596,14 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
 
         // Procurar a paragem de chegada na linha atual, a partir da paragem de partida
         int encontrou_chegada = 0;
-        printf("Linha em estudo: [%s]\n",linha->nome);
-        for ( d = i; d < linha->num_paragens; d++) {
-             printf("Vou comparar : %s com : %s\n",linha->paragens[d], chegada);
-            if (strcmp(linha->paragens[d], chegada) == 0) {
-                printf("Encontrei\n");
+        //printf("Linha em estudo: [%s]\n",linha->nome);
+        for ( d=i; d < linha->num_paragens; d++) {
+            strcpy(templinha,linha->paragens[d]);
+            Upper(templinha);
+            strcpy(tempparagem,chegada);
+            Upper(tempparagem);  
+           // printf("Vou comparar : %s com : %s\n",templinha,tempparagem);
+            if (strcmp(templinha, tempparagem) == 0) {
                 encontrou_chegada = 1;
                 break;
             }
@@ -605,7 +617,8 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
 
         // Encontrou o percurso
         encontrou_percurso = 1;
-        printf("Linha %s: ", linha->nome);
+        printf(" %s : ", linha->nome);
+        
         for (int j = i; j <=d; j++) {
             printf("%s", linha->paragens[j]);
             if (j < d) {

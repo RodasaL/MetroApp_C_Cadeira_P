@@ -16,3 +16,4 @@ void removerparagens(Paragem *paragens);
 void adicionalinhadoc(Sistema *sistema, Paragem *paragens);
 NoLinha* inicializar_lista(Sistema *sistema);
 void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada);
+void Upper(char *str);
