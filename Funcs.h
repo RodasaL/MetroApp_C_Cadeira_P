@@ -418,7 +418,7 @@ void printaparagensU(Paragem *paragens){
     }
 }
 
-void removerparagens(Paragem *paragens){
+void removerparagens(Paragem *paragens, NoLinha *lista_linhas){
     char escolhido[10];
     int numero;
     if (paragens->num_paragensp == 0 ){
@@ -428,6 +428,14 @@ void removerparagens(Paragem *paragens){
         printaparagensU(paragens);
         printf("Introduza o codigo da paragem a ser removida\n");
         scanf("%s", escolhido);
+        if (paragens->num_paragensp == 1){
+            free(paragens->nomep[0]);
+            free(paragens->codigop[0]);
+            paragens->nomep = realloc(paragens->nomep, (paragens->num_paragensp - 1) * sizeof(char *));
+            paragens->codigop = realloc(paragens->codigop, (paragens->num_paragensp - 1) * sizeof(char *));
+            paragens->num_paragensp--;
+        }
+        else{
         for (int k = 0;k < paragens->num_paragensp;k++){
             if (strcmp(escolhido, paragens->codigop[k])==0){
                 free(paragens->nomep[k]);
@@ -451,6 +459,7 @@ void removerparagens(Paragem *paragens){
             paragens->num_paragensp--;
             break;
             }
+        }
         }
     }
 }
@@ -745,13 +754,13 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          break;
       case 2:
          printf("Opcao 2 selecionada\n");
-         removerparagens(paragens);
+         removerparagens(paragens,lista_linhas);
          break;
       case 3:
          printf("Opcao 3 selecionada\n");
          printaparagens(lista_linhas);
-         //printaparagensU(paragens); teste lista ligada
-         break;
+         printaparagensU(paragens); 
+                  break;
       case 4:
          printf("Opcao 4 selecionada\n");
          adicionalinhadoc(sistema, paragens);

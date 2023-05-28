@@ -12,7 +12,7 @@ void adicionar_linha(Sistema *sistema, char *nome_linha);
 void printaparagens(NoLinha *lista_linhas);
 void printaparagensU(Paragem *paragens);
 void adicionaparagemutilizador(Paragem *paragens);
-void removerparagens(Paragem *paragens);
+void removerparagens(Paragem *paragens,NoLinha *lista_linhas);
 void adicionalinhadoc(Sistema *sistema, Paragem *paragens);
 NoLinha* inicializar_lista(Sistema *sistema);
 void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada);
