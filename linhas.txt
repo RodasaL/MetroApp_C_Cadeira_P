@@ -4,8 +4,10 @@ paragem0 #Z000
 Linha Secundaria
 Parque da Cidade2 #P000
 Ponte #P03
+Viaduto #P003
 Ferrovia #P073
 Casa do Mel #F514
+Flores #A544
 Coimbra-D #Z1323
 
 Linha Alta
