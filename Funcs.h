@@ -422,15 +422,69 @@ NoLinha *no = lista_linhas;
            
 
 }
+void printaparagens3(NoLinha *lista_linhas){
+    NoLinha *no = lista_linhas;
+    Linha *linha = no->linha;
+    int y = 1, j = 0;
+    for (int i = 0; i < linha->num_paragens;i++){
+        if(i == 0){
+        printf(" [%d]:%s:[%d]",j,linha->paragens[i],y);
+        }
+        else{
+        printf(":%s:[%d]",linha->paragens[i],y);
+        }
+        y++;//-> 2
+        }
+    printf("\n");
+}
 void printaparagensU(Paragem *paragens){
     printf("Paragens do utilizador:\n");
     for (int u=0; u < paragens->num_paragensp; u++){
         if(paragens->codigop[u][0] == 'U'){
-        printf("->%s %s\n",paragens->nomep[u], paragens->codigop[u]);
+        printf("%d->%s %s\n",u,paragens->nomep[u], paragens->codigop[u]);
         }
     }
 }
-
+char* getparagem(Paragem *paragens, int parag){
+    int encontrou = 0;
+    char* escolhida = malloc(sizeof(char*)); 
+    printf("Recebi no getparagem %d\n",parag);
+    for (int u=0; u < paragens->num_paragensp; u++){
+        if(paragens->codigop[u][0] == 'U'){
+        if(parag == u){
+            encontrou = 1;
+             escolhida = realloc(escolhida,sizeof(char) * sizeof(paragens->nomep[u]));
+         strcpy(escolhida,paragens->nomep[u]);
+        }
+        }
+    }
+    if (encontrou != 1){
+        printf("\nErro-Não foi possivel encontrar a paragem\n");
+        exit(1);
+    }
+    
+    return escolhida;
+}
+char* getcodigo(Paragem *paragens, char parag[]){
+    int encontrou = 0;
+    char* escolhida = malloc(sizeof(char*)); 
+    printf(" recebi ->:%s: / :%s:",parag,paragens->nomep[0]);
+    for (int u=0; u < paragens->num_paragensp; u++){
+        if(paragens->codigop[u][0] == 'U'){
+        if(strcmp(parag,paragens->nomep[u])==0){
+            encontrou = 1;
+            escolhida = realloc(escolhida,sizeof(char) * sizeof(paragens->codigop[u]));
+         strcpy(escolhida,paragens->codigop[u]);
+        }
+        }
+    }
+    if (encontrou != 1){
+        printf("Erro -  Cod da paragem escolhida nao encontrado\n");
+        exit(1);
+    }
+    return escolhida;
+    
+}
 void removerparagens(Paragem *paragens, NoLinha *lista_linhas){
     char escolhido[10];
     int numero, encontrou = 0;
@@ -724,101 +778,164 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
             }
 }
 
-void atualizarlinha(Sistema *sistema,NoLinha *lista_linhas){
-    NoLinha *no = lista_linhas;
-    int escolha,escolha2, aprovado = 0, flag = 1;
-    char cod[20];
-    printf("Escolha a linha que pretende atualizar:\n");
-    printalinhas(lista_linhas);
-    scanf("%d",&escolha);
-    for(int i= 0;i < sistema->num_linhas; i++){
-        if(i == escolha){
-            aprovado = 1;
+void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragens) {
+  NoLinha * no = lista_linhas;
+  int escolha, escolha2, aprovado = 0, flag = 1;
+  char cod[20], in [20], temppar[20], tempcod[20];
+  int parag, posicao;
+  char tempparagem1[20], tempcod1[20], tempparagem2[20], tempcod2[20];
+  printf("Escolha a linha que pretende atualizar:\n");
+  printalinhas(lista_linhas);
+  scanf("%d", & escolha);
+  for (int i = 0; i < sistema -> num_linhas; i++) {
+    if (i == escolha) {
+      aprovado = 1;
 
-        }
     }
-    if (aprovado == 0){
-        printf("Erro na escolha da linha\n");
-        printf("Escolha novamente\n");
-        atualizarlinha(sistema, lista_linhas);
+  }
+  if (aprovado == 0) {
+    printf("Erro na escolha da linha\n");
+    printf("Escolha novamente\n");
+    atualizarlinha(sistema, lista_linhas, paragens);
+  }
+  if (aprovado == 1) {
+    for (int x = 0; x < escolha; x++) {
+      no = no -> prox;
     }
-    if(aprovado == 1){
-        for(int x = 0; x<escolha; x++){
-        no=no->prox;
-    }
-    Linha *linha = no->linha;
-        printf("Linha escolhida -%s-\n",linha->nome);
-        printaparagens2(no);
-        printf("Pretende \n 1-Adicionar Paragem \n 2-Remover Paragem\n");
-        scanf("%d",&escolha2);
-        while(escolha2 != 1 && escolha2 != 2){
-            while (getchar() != '\n');
-         fflush(stdout);
-        printf("Pretende \n 1-Adicionar Paragem \n 2-Remover Paragem\n");
-        scanf("%d",&escolha2);
+    Linha * linha = no -> linha;
+    printf("Linha escolhida -%s-\n", linha -> nome);
+    printaparagens2(no);
+    printf("Pretende \n 1-Adicionar Paragem \n 2-Remover Paragem\n");
+    scanf("%d", & escolha2);
+    while (escolha2 != 1 && escolha2 != 2) {
+      while (getchar() != '\n');
+      fflush(stdout);
+      printf("Pretende \n 1-Adicionar Paragem \n 2-Remover Paragem\n");
+      scanf("%d", & escolha2);
 
+    }
+    if (escolha2 == 1) {
+      printaparagensU(paragens);
+      printf("Introduza o numero da paragem a adicionar e a posicao escolhida\n");
+      printaparagens3(no);
+      printf("Exemplo:20 3\n Escolheu a paragem 20 que ira ser colocada na posicao 3\n");
+      printf("Quanto terminar introduza :Sair:\n");
+      while (flag == 1) {
+        while (getchar() != '\n');
+        fflush(stdout);
+        fgets(in, sizeof(in), stdin);
+        // remove o caractere de nova linha
+        in [strcspn(in, "\n")] = '\0';
+        Upper(in);
+        if (strcmp(in,"SAIR") == 0) {
+          flag = 0;
         }
-        if(escolha2 == 1){
+        if (flag == 1) {
+          sscanf(in, "%d %d", & parag, & posicao);
+          //obtemparagem
+          char * getp = getparagem(paragens, parag);
 
-        }
-        else{
-            while(flag == 1){
-                printaparagens2(no);
-                printf("Introduza o cod da paragem a remover\n");
-                printf("Quanto terminar introduza :Sair:\n");
-                scanf("%s",cod);
-                Upper(cod);
-                if(strcmp(cod,"SAIR")==0){
-                    flag = 0;
-                }
-                if(flag == 1){
-                    for(int x = 0;x < linha->num_paragens; x++){
-                        if(strcmp(cod,linha->codigo[x])==0){
-                            if(linha->num_paragens == 1){
-                                strcpy(linha->paragens[x],"X");
-                                strcpy(linha->codigo[x],"X");
-                                free(linha->paragens[x]);
-                                free(linha->codigo[x]);
-                                linha->num_paragens--;
-                                
-                            }
-                            else{
-                                free(linha->paragens[x]);
-                                free(linha->codigo[x]);
-                                for (int i = x; i < linha->num_paragens - 1; i++) {
-                                printf("*%s *%s\n",linha->paragens[i],linha->paragens[i+1]);
-                                printf("*%s *%s\n",linha->codigo[i],linha->codigo[i+1]);
-                                linha->paragens[i] = linha->paragens[i+1];
-                                linha->codigo[i] = linha->codigo[i+1];
-                             }
-                            
-                            linha->paragens = realloc(linha->paragens, (linha->num_paragens - 1) * sizeof(char *));
-                             linha->codigo = realloc(linha->codigo, (linha->num_paragens - 1) * sizeof(char *));
-        
-                if (linha->paragens == NULL || linha->codigo == NULL) {
-            // erro ao alocar memória
-            printf("Erro a realocar memoria do tamanho do ponteiro no removerparagens\n");
-            exit(1);
+          char * getc = getcodigo(paragens, getp);
+          printf("\n%s %s\n", getp, getc);
+          if (posicao == 0) {
+            printf("iF Posicao %d\n",posicao);
+            linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
+            linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens + 1) * sizeof(char * ));
+
+            for (int i = linha -> num_paragens - 1; i > 0; i--) {
+
+              strcpy(linha -> paragens[i],linha -> paragens[i - 1]);
+                strcpy(linha -> codigo[i],linha -> codigo[i - 1]);
+
             }
-                linha->num_paragens--;
-                            }
-                        }
-                        
-                    }
-                   
-                
-        
-                    
-                    
+            strcpy(linha -> paragens[0], getp);
+            strcpy(linha -> codigo[0], getc);
+            linha -> num_paragens++;
+          } else if (posicao == linha -> num_paragens) {
+            printf("Else IF Posicao %d\n",posicao);
+            linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
+            linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens + 1) * sizeof(char * ));
+            strcpy(linha -> paragens[linha -> num_paragens], getp);
+            strcpy(linha -> codigo[linha -> num_paragens], getc);
+            linha -> num_paragens++;
+          } else {
+            printf("Else Posicao %d\n",posicao);
+            for (int i = 1; i < linha -> num_paragens; i++) {
+              if (posicao == i) {
+                printf("Entrei\n");
+                 linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
+                  linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens + 1) * sizeof(char * ));
+                for (int x = linha -> num_paragens; x > posicao; x--) {
+                    printf("Entrei o For\n");
 
+                 strcpy(linha -> paragens[x],linha -> paragens[x - 1]);
+                  strcpy(linha -> codigo[x],linha -> codigo[x - 1]);
                 }
+                printf("...\n");
+                strcpy(linha -> paragens[posicao], getp);
+                strcpy(linha -> codigo[posicao], getc);
+                linha -> num_paragens++;
+                flag = 0;
+              }
             }
-        }
-        
-    }
+          }
 
+        }
+
+      }
+
+    }
+  
+   else {
+    while (flag == 1) {
+      printaparagens2(no);
+      printf("Introduza o cod da paragem a remover\n");
+      printf("Quanto terminar introduza :Sair:\n");
+      scanf("%s", cod);
+      Upper(cod);
+      if (strcmp(cod, "SAIR") == 0) {
+        flag = 0;
+      }
+      if (flag == 1) {
+        for (int x = 0; x < linha -> num_paragens; x++) {
+          if (strcmp(cod, linha -> codigo[x]) == 0) {
+            if (linha -> num_paragens == 1) {
+              strcpy(linha -> paragens[x], "X");
+              strcpy(linha -> codigo[x], "X");
+              free(linha -> paragens[x]);
+              free(linha -> codigo[x]);
+              linha -> num_paragens--;
+
+            } else {
+              free(linha -> paragens[x]);
+              free(linha -> codigo[x]);
+              for (int i = x; i < linha -> num_paragens - 1; i++) {
+                printf("*%s *%s\n", linha -> paragens[i], linha -> paragens[i + 1]);
+                printf("*%s *%s\n", linha -> codigo[i], linha -> codigo[i + 1]);
+                linha -> paragens[i] = linha -> paragens[i + 1];
+                linha -> codigo[i] = linha -> codigo[i + 1];
+              }
+
+              linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens - 1) * sizeof(char * ));
+              linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens - 1) * sizeof(char * ));
+
+              if (linha -> paragens == NULL || linha -> codigo == NULL) {
+                // erro ao alocar memória
+                printf("Erro a realocar memoria do tamanho do ponteiro no removerparagens\n");
+                exit(1);
+              }
+              linha -> num_paragens--;
+            }
+          }
+
+        }
+
+      }
+    }
+  }
+
+}
     
-
 }
    void libertar_sistema(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas) {
      NoLinha *atual = lista_linhas;
@@ -890,7 +1007,7 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          break;
       case 5:
          printf("Opcao 5 selecionada\n");
-         atualizarlinha(sistema,lista_linhas);
+         atualizarlinha(sistema,lista_linhas,paragens);
          break;
       case 6:
          printf("Opcao 6 selecionada\n");
