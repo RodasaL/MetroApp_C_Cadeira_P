@@ -445,6 +445,41 @@ void printaparagensU(Paragem *paragens){
         }
     }
 }
+void printaparagensUR(Paragem *paragens, NoLinha *lista_linhas){
+    char parg1 [30], parg2[30];
+    int adicionada = 0, contador = 0;
+    
+    for (int u=0; u < paragens->num_paragensp; u++){
+        adicionada = 0;
+        if((paragens->codigop[u][0] == 'U')){
+            strcpy(parg1,paragens->nomep[u]);
+            NoLinha *no2= lista_linhas;
+            Linha *linha2 = no2->linha;
+            while(no2 != NULL){
+         for(int x = 0; x<linha2->num_paragens; x++){
+          strcpy(parg2,linha2->paragens[x]);
+          if(strcmp(parg1,parg2)==0){
+            adicionada = 1;
+          }
+         }
+         no2=no2->prox;
+          if (no2 != NULL) {
+                  linha2 = no2->linha;
+                }
+            }
+         if(adicionada == 0){
+            printf("%d->%s %s\n",u,paragens->nomep[u], paragens->codigop[u]);
+            contador++;
+         }
+        
+        }
+       
+    }
+    
+    if(contador == 0){
+        printf("Nenhuma paragem disponivel a ser eliminada pois todas pertencem a uma linha\n");
+    }
+}
 char* getparagem(Paragem *paragens, int parag){
     int encontrou = 0;
     char* escolhida = malloc(sizeof(char*)); 
@@ -489,10 +524,11 @@ void removerparagens(Paragem *paragens, NoLinha *lista_linhas){
     char escolhido[10];
     int numero, encontrou = 0;
     if (paragens->num_paragensp == 0 ){
-        printf("Impossivel remover paragens no momento\n");
+        printf("Impossivel remover paragens no momento porque nao existem paragens a remover\n");
     }
     else {
-        printaparagensU(paragens);
+        printf("Else\n");
+        printaparagensUR(paragens,lista_linhas);
         printf("Introduza o codigo da paragem a ser removida\n");
         scanf("%s", escolhido);
         Upper(escolhido);
@@ -625,7 +661,7 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
         // Encontrou o percurso
         encontrou_percurso = 1;
         printf(" %s : ", linha->nome);
-        
+        printf("Sentido normal\n");
         for (int j = i; j <=d; j++) {
             printf("%s", linha->paragens[j]);
             if (j < d) {
@@ -644,9 +680,88 @@ void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
     }
 }
 
+
+void encontrar_percurso_inverso(NoLinha *lista_linhas, char *partida, char *chegada) {
+    
+    NoLinha *no = lista_linhas;
+    int encontrou_percurso = 0;
+    char templinha[40], tempparagem[40];
+    while (no != NULL) {
+        Linha *linha = no->linha;
+
+        // Procurar a paragem de partida na linha atual
+        int encontrou_partida = 0;
+        int i, d;
+        //printf("Linha em estudo: [%s]\n",linha->nome);
+        for (i = 0; i < linha->num_paragens; i++) {
+            strcpy(templinha,linha->paragens[i]);
+            Upper(templinha);
+            strcpy(tempparagem,partida);
+            Upper(tempparagem);
+         
+            //printf("Vou comparar : %s com : %s\n",templinha,tempparagem);
+            if (strcmp(templinha,tempparagem) == 0) {
+                encontrou_partida = 1;
+                break;
+            }
+        }
+
+        // Se não encontrou a paragem de partida, passar à próxima linha
+        if (!encontrou_partida) {
+            no = no->prox;
+            continue;
+        }
+
+        // Procurar a paragem de chegada na linha atual, a partir da paragem de partida
+        int encontrou_chegada = 0;
+        //printf("Linha em estudo: [%s]\n",linha->nome);
+        for ( d=i; d >= 0; d--) {
+            strcpy(templinha,linha->paragens[d]);
+            Upper(templinha);
+            strcpy(tempparagem,chegada);
+            Upper(tempparagem); 
+          
+           // printf("Vou comparar : %s com : %s\n",templinha,tempparagem);
+            if (strcmp(templinha, tempparagem) == 0) {
+                encontrou_chegada = 1;
+                break;
+            }
+        }
+
+        // Se não encontrou a paragem de chegada, passar à próxima linha
+        if (!encontrou_chegada) {
+            no = no->prox;
+            continue;
+        }
+
+        // Encontrou o percurso
+        encontrou_percurso = 1;
+        printf(" %s : ", linha->nome);
+        printf("Sentido inverso\n");       
+        for (int j = i; j >=d; j--) {
+            printf("%s", linha->paragens[j]);
+            if (j > d) {
+                printf(" -> ");
+            }
+        }
+        printf("\n");
+
+        // Passar à próxima linha para verificar se há outros percursos possíveis
+        no = no->prox;
+    }
+
+    // Se não encontrou percurso, mostrar mensagem
+    if (!encontrou_percurso) {
+        printf("Nao foi encontrado percurso entre %s e %s.\n", partida, chegada);
+    }
+}
+
+
+
+
 void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char * chegada) {
     int encontrou_percurso = 0;
-    int indicePlinha1, indicePlinha2;
+    int indicePlinha1, indicePlinha2, poschegada;
     char templinha[40], tempparagem[40];
   // Procurar a paragem de partida
   strcpy(tempparagem,partida);
@@ -655,29 +770,25 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
   NoLinha * no1 = lista_linhas;
   while (no1 != NULL) {
     Linha * linha1 = no1 -> linha;
-    printf("Vou para o for\n");
-    printf("Linha :%s:\n",linha1->nome);
     for (int i = 0; i < linha1 -> num_paragens; i++) {
         strcpy(templinha,linha1->paragens[i]);
         Upper(templinha);
         strcpy(tempparagem,partida);
         Upper(tempparagem);
-        printf("Hey\n");
-        printf(":%s: :%s:\n",templinha,tempparagem);
       if (strcmp(templinha, tempparagem) == 0) {
         // Encontrou a paragem de partida na linha 1
-        printf("Encontrei paragem de partida na linha %s\n",linha1->nome);
+        
         // Procurar a paragem de chegada na mesma linha
         encontrou_parLinha1 = 0;
        
         //!var se for = 0 ta bacano e entra no if 
         
         if (!encontrou_parLinha1) {
-            printf("Entrei\n");
+            
           NoLinha * no2 = lista_linhas;
           while (no2 != NULL) {
             Linha * linha2 = no2 -> linha;
-            printf("Tudo\n");
+            
             // Se a linha for diferente da linha 1
             if (linha2 != linha1) {
               // Procurar a paragem de chegada na linha 2
@@ -690,7 +801,7 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
         
                 if (strcmp(templinha,tempparagem) == 0) {
                   encontrou_chegada = 1;
-                  printf("chegada:%s\n",templinha);
+                  poschegada = k;
                   break;
                 }
               }
@@ -698,19 +809,19 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
               // Se não encontrou a paragem de chegada, passar à próxima linha
               if (!encontrou_chegada) {
                 no2 = no2 -> prox;
-                printf("nada\n");
+                
                 continue;
               }
 
               // Procurar paragem comum entre as duas linhas
               int encontrou_transbordo = 0;
               for (int j = i + 1; j < linha1 -> num_paragens; j++) {
-                for (int k = 0; k < linha2 -> num_paragens; k++) {
-                  if (strcmp(linha1 -> paragens[j], linha2 -> paragens[k]) == 0) {
+                for (int k = poschegada - 1; k >= 0; k--) {
+                  if ((strcmp(linha1 -> paragens[j], linha2 -> paragens[k]) == 0)&& linha2->paragens[k] != linha2->paragens[poschegada]) {
                     encontrou_transbordo = 1;
                     indicePlinha1=j;
                     indicePlinha2=k;
-                    printf("Transbordo na paragem %s\n", linha1 -> paragens[j]);
+                    
                     break;
                   }
                 }
@@ -722,24 +833,24 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
               // Se não encontrou paragem de transbordo, passar à próxima linha
               if (!encontrou_transbordo) {
                 no2 = no2 -> prox;
-                printf("Prox linha2\n");
+                
                 continue;
               }
 
               // Encontrou percurso com transbordo
+              
               encontrou_percurso = 1;
-              printf("Linha %s: ", linha1 -> nome);
+              printf(" %s: Sentido Normal\n ", linha1 -> nome);
               for (int j = i; j <= indicePlinha1; j++) {
                 printf("%s", linha1 -> paragens[j]);
-                if (j < indicePlinha1) {//Maybe erro aqui FIXME:
+                if (j < indicePlinha1) {
                   printf(" -> ");
                 }
               }
               printf("\n");
 
-              printf("Transbordo na paragem %s\n", linha1 -> paragens[indicePlinha1]);
-
-              printf("Linha %s: ", linha2 -> nome);
+              
+              printf("%s: ", linha2 -> nome);
               for (int j = indicePlinha2; j < linha2 -> num_paragens; j++) {
                 printf("%s", linha2 -> paragens[j]);
                 if (j < linha2 -> num_paragens - 1) {
@@ -747,16 +858,16 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
                 }
               }
               printf("\n");
-              printf("Vou deixar a linha :%s:\n",linha2->nome);
+    
               // Passar à próxima linha para verificar se há outros percursos possíveis
               no2 = no2 -> prox;
-              printf("E vou para :%s:\n",linha2->nome);
+              
             }
             else{
-                printf("Vou deixar a linha :%s:\n",linha2->nome);
+              
               // Passar à próxima linha para verificar se há outros percursos possíveis
               no2 = no2 -> prox;
-              printf("E vou para :%s:\n",linha2->nome);
+              
             }
             
           }
@@ -766,9 +877,140 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
             
     }
    
-    printf("Next->");
+    
     no1 = no1->prox;//Procura outra linha1
-    printf("%s\n",linha1->nome);
+               
+            
+  }
+   // fim do while para percorrer lista de linhas
+            if (!encontrou_percurso) {
+              printf("Não foi possível encontrar um percurso entre as paragens especificadas.\n");
+            }
+}
+
+
+
+void encontrar_percurso_transbordo_inverso(NoLinha * lista_linhas, char * partida, char * chegada) {
+    int encontrou_percurso = 0;
+    int indicePlinha1, indicePlinha2, poschegada;
+    char templinha[40], tempparagem[40];
+  // Procurar a paragem de partida
+  strcpy(tempparagem,partida);
+    Upper(tempparagem);
+    int encontrou_parLinha1 = 1;
+  NoLinha * no1 = lista_linhas;
+  while (no1 != NULL) {
+    Linha * linha1 = no1 -> linha;
+    for (int i = 0; i < linha1 -> num_paragens; i++) {
+        strcpy(templinha,linha1->paragens[i]);
+        Upper(templinha);
+        strcpy(tempparagem,partida);
+        Upper(tempparagem);
+      if (strcmp(templinha, tempparagem) == 0) {
+        // Encontrou a paragem de partida na linha 1
+        
+        // Procurar a paragem de chegada na mesma linha
+        encontrou_parLinha1 = 0;
+       
+        //!var se for = 0 ta bacano e entra no if 
+        
+        if (!encontrou_parLinha1) {
+          NoLinha * no2 = lista_linhas;
+          while (no2 != NULL) {
+            Linha * linha2 = no2 -> linha;
+            
+            // Se a linha for diferente da linha 1
+            if (linha2 != linha1) {
+              // Procurar a paragem de chegada na linha 2
+              int encontrou_chegada = 0;
+              for (int k = 0; k < linha2 -> num_paragens; k++) {
+                    strcpy(templinha,linha2->paragens[k]);
+                    Upper(templinha);
+                    strcpy(tempparagem,chegada);
+                    Upper(tempparagem);
+        
+                if (strcmp(templinha,tempparagem) == 0) {
+                  encontrou_chegada = 1;
+                  poschegada = k;
+                  
+                  break;
+                }
+              }
+
+              // Se não encontrou a paragem de chegada, passar à próxima linha
+              if (!encontrou_chegada) {
+                no2 = no2 -> prox;
+                
+                continue;
+              }
+
+              // Procurar paragem comum entre as duas linhas
+              int encontrou_transbordo = 0;
+              for (int j = i - 1; j >= 0; j--) {
+                for (int k = poschegada + 1; k < linha2 -> num_paragens; k++) {
+                  if ((strcmp(linha1 -> paragens[j], linha2 -> paragens[k]) == 0)&& linha2->paragens[k]!= linha2->paragens[poschegada]) {
+                    encontrou_transbordo = 1;
+                    indicePlinha1=j;
+                    indicePlinha2=k;
+                    
+                    break;
+                  }
+                }
+                if (encontrou_transbordo) {
+                  break;
+                }
+              }
+
+              // Se não encontrou paragem de transbordo, passar à próxima linha
+              if (!encontrou_transbordo) {
+                no2 = no2 -> prox;
+                
+                continue;
+              }
+
+              // Encontrou percurso com transbordo
+              
+              encontrou_percurso = 1;
+              printf(" %s: Sentido Inverso\n ", linha1 -> nome);
+              for (int j = i; j >= indicePlinha1; j--) {
+                printf("%s", linha1 -> paragens[j]);
+                if (j > indicePlinha1) {
+                  printf(" -> ");
+                }
+              }
+              printf("\n");
+
+              
+              printf("%s: ", linha2 -> nome);
+              for (int j = indicePlinha2; j >= poschegada; j--) {
+                printf("%s", linha2 -> paragens[j]);
+                if (j > poschegada) {
+                  printf(" -> ");
+                }
+              }
+              printf("\n");
+              
+              // Passar à próxima linha para verificar se há outros percursos possíveis
+              no2 = no2 -> prox;
+              
+            }
+            else{
+                
+              // Passar à próxima linha para verificar se há outros percursos possíveis
+              no2 = no2 -> prox;
+              
+            }
+            
+          }
+        }
+      }
+        
+            
+    }
+   
+    
+    no1 = no1->prox;//Procura outra linha1
+    
             
             
   }
@@ -777,6 +1019,7 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
               printf("Não foi possível encontrar um percurso entre as paragens especificadas.\n");
             }
 }
+
 
 void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragens) {
   NoLinha * no = lista_linhas;
@@ -841,6 +1084,8 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
             printf("iF Posicao %d\n",posicao);
             linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
             linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens + 1) * sizeof(char * ));
+            linha->paragens[linha->num_paragens] = malloc((strlen(getp) + 1) * sizeof(char));
+            linha->codigo[linha->num_paragens] = malloc((strlen(getc) + 1) * sizeof(char));
 
             for (int i = linha -> num_paragens - 1; i > 0; i--) {
 
@@ -855,17 +1100,22 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
             printf("Else IF Posicao %d\n",posicao);
             linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
             linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens + 1) * sizeof(char * ));
+            linha->paragens[linha->num_paragens] = malloc((strlen(getp) + 1) * sizeof(char));
+            linha->codigo[linha->num_paragens] = malloc((strlen(getc) + 1) * sizeof(char));
             strcpy(linha -> paragens[linha -> num_paragens], getp);
             strcpy(linha -> codigo[linha -> num_paragens], getc);
             linha -> num_paragens++;
           } else {
             printf("Else Posicao %d\n",posicao);
-            for (int i = 1; i < linha -> num_paragens; i++) {
-              if (posicao == i) {
+            
+              
                 printf("Entrei\n");
                  linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
                   linha -> codigo = realloc(linha -> codigo, (linha -> num_paragens + 1) * sizeof(char * ));
-                for (int x = linha -> num_paragens; x > posicao; x--) {
+                  linha->paragens[linha->num_paragens] = malloc((strlen(getp) + 1) * sizeof(char));
+                  linha->codigo[linha->num_paragens] = malloc((strlen(getc) + 1) * sizeof(char));
+
+                for (int x = linha -> num_paragens; x >= posicao; x--) {
                     printf("Entrei o For\n");
 
                  strcpy(linha -> paragens[x],linha -> paragens[x - 1]);
@@ -876,8 +1126,8 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
                 strcpy(linha -> codigo[posicao], getc);
                 linha -> num_paragens++;
                 flag = 0;
-              }
-            }
+              
+            
           }
 
         }
@@ -1033,11 +1283,20 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          fflush(stdout);
          fgets(paragem_fim, sizeof(paragem_fim), stdin);
          paragem_fim[strcspn(paragem_fim, "\n")] = '\0'; // remove o caractere de nova linha
-       
-    
+
+         printf("\n");
+         printf("-----------------------\n");
+         printf("Percurso linha unica [Sentido Ida]\n");
          encontrar_percurso(lista_linhas,paragem_incio,paragem_fim);
          printf("-----------------------\n");
+         printf("Percurso linha unica [Sentido Volta]\n");
+         encontrar_percurso_inverso(lista_linhas,paragem_incio,paragem_fim);
+         printf("-----------------------\n");
+         printf("Percurso duas linhas [Sentido Ida]\n");
          encontrar_percurso_transbordo(lista_linhas,paragem_incio,paragem_fim);
+         printf("-----------------------\n");
+         printf("Percurso duas linhas [Sentido Volta]\n");
+         encontrar_percurso_transbordo_inverso(lista_linhas,paragem_incio,paragem_fim);
          break;
       case 8:
             printf("Opcao 8 selecionada\n");

@@ -9,12 +9,15 @@ Ferrovia #P073
 Casa do Mel #F514
 Flores #A544
 Coimbra-D #Z1323
+Paragem Fim #H123
 
 Linha Alta
 Parque do Roubo #L331
+Paragem Fim #H123
 Viaduto #P003
 Paragem #J973
 Flores #A544
+Loja do Cidadao #P013
 Zona Alta #V423
 Aviario #I221
 
@@ -22,7 +25,10 @@ Linha da Baixa
 Parque da Cidade #P011
 Portagem #P09
 Flores #A544
+Aviario #I221
 Loja do Cidadao #P013
 Casa do Sal #F554
+Casa do Mel #F514
+Paragem Fim #H123
 Coimbra-B #H123
 

@@ -12,6 +12,7 @@ int flag2 = 1;
 int main() {
     int flaglinha = -1;
     int opcao;
+    int opcao2;
    
      Sistema* sistema = (Sistema*) malloc(sizeof(Sistema));
      Paragem* paragens= (Paragem*) malloc(sizeof(Paragem));
@@ -26,9 +27,10 @@ int main() {
      paragens->num_paragensp =0;
      sistema->num_linhas = 0;
      sistema->Snumparagens = 0;
+     printf("Pretende ler um ficheiro: 1-->txt \n 2-->binario\n");
+     scanf("%d",&opcao2);
     adicionalinhadoc(sistema,paragens);
-    printf("teste->%s\n",sistema->linhas[0].nome);
-    printf("teste2 ->%s\n",sistema->linhas[0].paragens[0]);
+ 
     NoLinha* lista_linhas =inicializar_lista(sistema);
     while (flag2==1){
     printf("Bem vindo!\n");
