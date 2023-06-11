@@ -16,11 +16,7 @@ typedef struct{
     char **codigop;
     int num_paragensp;
 }Paragem;
-typedef struct{
-    char *nomep;
-    char **codigop;
-    int num_paragensp;
-}Paragem2;
+
 
 typedef struct 
 {
@@ -47,10 +43,7 @@ typedef struct NoLinha {
     struct NoLinha *prox;
 } NoLinha;
 
-typedef struct NoPercurso {
-    Linha *linha;
-    struct NoPercurso *prox;
-} NoPercurso;
+
 
 
 /*Paragem** paragens;*/
@@ -90,55 +83,7 @@ void adicionar_linha(Sistema *sistema, char *nome_linha){
     
    
 }
-void adicionar_linhaUinput(Sistema *sistema){
-    char nomedalinha[40],  paragem[40],  cod[7];
-    int quantidade,flagloop=1;
-    char *testelinha;
-    while(flagloop == 1){
-        int flags=0;
-    printf("Introduza o nome da linha (Nome: 'Linha Central'):%s\n");
-    scanf("%s",nomedalinha);
-    testelinha=strstr(nomedalinha,"Linha");
-    if (testelinha == NULL){
-        printf("O nome da linha tem de ser iniciado por 'Linha'\n");//testes de seguranca em falta TODO:
-         printf("Introduza o nome da linha (Nome: 'Linha Central'):%s\n");
-        scanf("%s",nomedalinha);
-    }
-    int indlinha= sistema->num_linhas;
-    --indlinha;
-     if (indlinha < 0 ) {
-        printf("Indice de linha invalido!\n");
-        return;
-    } 
-    
-   
-    for(int y = 0; y<sistema->num_linhas;y++){
-        Linha *linha = (&sistema->linhas[y]);
-         if ( linha == NULL) {
-        printf("Linha nao pode ser nula.\n");
-        return;
-    }
-        if( strcmp(nomedalinha,linha->nome)==0){
-            printf("Erro->O nome da linha ja existe!\n");
-            flags=1;
-        }
-    }
-    if(flags==0){
-    printf("Introduza a quantidade de paragens que a linha vai ter:%d\n");
-    scanf("%d",&quantidade);
-    for(int u = 0; u<quantidade; u++){
-        printf("Introduza o nome da paragem:\n");
-        scanf("%s",paragem);
-        for(int j=0;j<sistema->paragens->num_paragensp;j++){
-        if(strcmp(paragem,sistema->paragens->nomep[j])==0){
-            printf("A paragem %s ja existe no sistema, vou busca-la\n");
-            //nao acabei lul
-        }
-        }
-    }
-    }
-    }
-}
+
 void adicionar_paragem(Sistema *sistema,Linha *linha, char *nome_paragem, char *codigo_paragem, Paragem *paragens) {
       int indicadorlinha=sistema->num_linhas;
      --indicadorlinha;
@@ -251,6 +196,7 @@ paragens->num_paragensp++;
 
     
 }
+
 void adicionaparagemutilizador(Paragem *paragens){
     char Nnome[40];
     char cod[6];
@@ -305,7 +251,10 @@ strcpy(paragens->codigop[paragens->num_paragensp], cod);
 // atualiza o número de paragens da estrutura
 paragens->num_paragensp++;
 
+
+
 }
+
 void adicionalinhadoc(Sistema *sistema,Paragem *paragens){
     char ficheiro[20],  linha123[264];
     char *extensao;
@@ -367,10 +316,117 @@ void adicionalinhadoc(Sistema *sistema,Paragem *paragens){
     fclose(arquivo);
 
 }
+
+
+
+void adicionalinhadoc2(Sistema *sistema,Paragem *paragens, NoLinha *lista_linhas){
+    char ficheiro[20],  linha123[264];
+    char *extensao;
+    int flag1 = 0;
+    int contador = 0;   
+    FILE *arquivo;
+       printf("Insere o nome do ficheiro para ler ('ficheiro.txt'):\n");
+    scanf("%s",ficheiro);
+    
+    
+    while (flag1 == 0){
+        extensao = strstr(ficheiro, ".txt");
+    if (extensao == NULL){
+        printf("Tem de inserir a extensao do arquivo ('.txt')\n");
+        printf("Insere o nome do ficheiro para ler ('ficheiro.txt'):\n");
+        scanf("%s",ficheiro);
+    }
+    else {
+        flag1 = 1;
+        
+    }
+    }
+    arquivo = fopen(ficheiro,"r");
+    if (arquivo == NULL){
+        printf("Erro ao abrir o arquivo!\n");
+        free(sistema);
+        
+    }
+    while (fgets(linha123, 400, arquivo)) {
+        int teste = 0; 
+        linha123[strcspn(linha123, "\r\n")] = 0; // remove o \n ou \r\n do final da linha
+        if (linha123[0] != '\0') { // verifica se a linha não está vazia
+            if (strncmp(linha123,"Linha",5)== 0) { // se a linha começa com Linha
+                printf ("\nLinha [%s] ainda nao mandei para a func\n",linha123);
+                adicionar_linha(sistema, linha123);//apenas para ficheiros
+                printf("ja mandei\n");
+                printf("HELP\n");
+                contador++;
+                if (contador != 0){
+                  Linha *linha = (&sistema->linhas[sistema->num_linhas - 2]);
+                  NoLinha *noatual = lista_linhas;
+                  while(noatual->prox!=NULL){
+                  noatual = noatual->prox;
+                  }
+                  NoLinha *novoNo = malloc(sizeof(NoLinha));
+                  novoNo->linha = linha;
+                  noatual->prox=novoNo;
+                  novoNo->prox=NULL;
+                }
+            } else { // paragem       
+                printf("Paragem time\n");         
+                char nome_paragem[MAX_NOME_PARAGEM], codigo[MAX_CODIGO_PARAGEM];
+                 sscanf(linha123, " %[^#] #%s ", nome_paragem, codigo);
+                  int tamanho= strlen(nome_paragem);
+                  nome_paragem[tamanho-1]='\0';
+                printf("Nome da paragem-> :%s:\n", nome_paragem);
+                printf("Código-> :%s:\n", codigo);
+                int indicador=sistema->num_linhas;
+                --indicador;
+                
+              for(int y = 0; y < paragens->num_paragensp; y++){
+              if(strcmp(nome_paragem,paragens->nomep[y])==0){
+                teste=1;
+              
+              break;
+              }
+              }
+      
+               
+                 
+
+                if (teste == 0){
+                  printf("A paragem %s nao sera adicionada por nao pertencer ao sistema\n",nome_paragem);
+                  
+                }
+                if (teste == 1){
+                Linha *linha = (&sistema->linhas[indicador]);
+                printf("Vou enviar a paragem\n");
+                adicionar_paragem(sistema,linha, nome_paragem, codigo,paragens);//falta guardar o codigo
+                
+                printf("Paragens da Linha-> [-%s-]\n",linha->nome);
+                printf("Numero de paragens da linha ->%d\n",linha->num_paragens);
+                }
+
+
+                
+            }
+        }
+    }
+    fclose(arquivo);
+    Linha *linha = (&sistema->linhas[sistema->num_linhas - 1]);
+                  NoLinha *noatual = lista_linhas;
+                  while(noatual->prox!=NULL){
+                  noatual = noatual->prox;
+                  }
+                  NoLinha *novoNo = malloc(sizeof(NoLinha));
+                  novoNo->linha = linha;
+                  noatual->prox=novoNo;
+                  novoNo->prox=NULL;
+
+}
+
+
+
 void printalinhas(NoLinha *lista_linhas){
     int numero = 0;
     if(lista_linhas == NULL) {
-        printf("A lista de linhas está vazia.\n");
+        printf("A lista de linhas esta vazia.\n");
         return;
     }
 
@@ -386,18 +442,9 @@ void printalinhas(NoLinha *lista_linhas){
 
 
 void printaparagens(NoLinha *lista_linhas){
-/*    for (int i=0; i < sistema->num_linhas;i++){
-        Linha *linha = &sistema->linhas[i];
-        printf("Paragens da Linha-> [-%s-]\n",linha->nome);
-        printf("Numero de paragens da linha ->%d\n",linha->num_paragens);
-        for (int x = 0; x < linha->num_paragens;x++){
-            printf("Paragem: %s %s\n",linha->paragens[x], linha->codigo[x]);
-        
-        }
-    }
-  */
+
   if(lista_linhas == NULL) {
-        printf("A lista de linhas está vazia.\n");
+        printf("A lista de linhas esta vazia.\n");
         return;
     }
 
@@ -444,7 +491,15 @@ void printaparagensU(Paragem *paragens){
         printf("%d->%s %s\n",u,paragens->nomep[u], paragens->codigop[u]);
         }
     }
+    
 }
+void printaparagens4(Paragem *paragens){
+for (int u=0; u < paragens->num_paragensp; u++){
+       
+        printf("%d->%s %s\n",u,paragens->nomep[u], paragens->codigop[u]);
+ }
+    }
+
 void printaparagensUR(Paragem *paragens, NoLinha *lista_linhas){
     char parg1 [30], parg2[30];
     int adicionada = 0, contador = 0;
@@ -500,6 +555,26 @@ char* getparagem(Paragem *paragens, int parag){
     
     return escolhida;
 }
+char* getparagem2(Paragem *paragens, int parag){
+    int encontrou = 0;
+    char* escolhida = malloc(sizeof(char*)); 
+    printf("Recebi no getparagem %d\n",parag);
+    for (int u=0; u < paragens->num_paragensp; u++){
+        
+        if(parag == u){
+            encontrou = 1;
+             escolhida = realloc(escolhida,sizeof(char) * sizeof(paragens->nomep[u]));
+         strcpy(escolhida,paragens->nomep[u]);
+        }
+        
+    }
+    if (encontrou != 1){
+        printf("\nErro-Não foi possivel encontrar a paragem\n");
+        exit(1);
+    }
+    
+    return escolhida;
+}
 char* getcodigo(Paragem *paragens, char parag[]){
     int encontrou = 0;
     char* escolhida = malloc(sizeof(char*)); 
@@ -520,6 +595,29 @@ char* getcodigo(Paragem *paragens, char parag[]){
     return escolhida;
     
 }
+
+char* getcodigo2(Paragem *paragens, char parag[]){
+    int encontrou = 0;
+    char* escolhida = malloc(sizeof(char*)); 
+    printf(" recebi ->:%s: / :%s:",parag,paragens->nomep[0]);
+    for (int u=0; u < paragens->num_paragensp; u++){
+        
+        if(strcmp(parag,paragens->nomep[u])==0){
+            encontrou = 1;
+            escolhida = realloc(escolhida,sizeof(char) * sizeof(paragens->codigop[u]));
+         strcpy(escolhida,paragens->codigop[u]);
+        }
+        
+    }
+    if (encontrou != 1){
+        printf("Erro -  Cod da paragem escolhida nao encontrado\n");
+        exit(1);
+    }
+    return escolhida;
+    
+}
+
+
 void removerparagens(Paragem *paragens, NoLinha *lista_linhas){
     char escolhido[10];
     int numero, encontrou = 0;
@@ -603,6 +701,30 @@ for (int i = sistema->num_linhas - 1; i >= 0; i--) {
     
 }
 return iniciolista;
+}
+void adicionarNO(NoLinha *lista_linhas, Sistema *sistema){
+  int o = 0;
+ NoLinha *noatual = lista_linhas;
+ 
+while(noatual->prox!=NULL){
+noatual = noatual->prox;
+o++;
+printf("no atual :%s:\n",noatual->linha->nome);
+}
+o++;
+for(o;o<sistema->num_linhas;o++){
+Linha *linha= &sistema->linhas[o];
+printf("Linha atual :%s:\n",linha->nome);
+NoLinha *novoNo = malloc(sizeof(NoLinha));
+novoNo->linha=linha;
+novoNo->prox=NULL;
+noatual->prox=novoNo;
+noatual=novoNo;
+
+}
+
+
+
 }
 
 void encontrar_percurso(NoLinha *lista_linhas, char *partida, char *chegada) {
@@ -745,6 +867,7 @@ void encontrar_percurso_inverso(NoLinha *lista_linhas, char *partida, char *cheg
             }
         }
         printf("\n");
+        printf("\n");
 
         // Passar à próxima linha para verificar se há outros percursos possíveis
         no = no->prox;
@@ -851,12 +974,13 @@ void encontrar_percurso_transbordo(NoLinha * lista_linhas, char * partida, char 
 
               
               printf("%s: ", linha2 -> nome);
-              for (int j = indicePlinha2; j < linha2 -> num_paragens; j++) {
+              for (int j = indicePlinha2; j <=poschegada; j++) {
                 printf("%s", linha2 -> paragens[j]);
-                if (j < linha2 -> num_paragens - 1) {
+                if (j < poschegada) {
                   printf(" -> ");
                 }
               }
+              printf("\n");
               printf("\n");
     
               // Passar à próxima linha para verificar se há outros percursos possíveis
@@ -1060,10 +1184,12 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
     if (escolha2 == 1) {
       printaparagensU(paragens);
       printf("Introduza o numero da paragem a adicionar e a posicao escolhida\n");
-      printaparagens3(no);
-      printf("Exemplo:20 3\n Escolheu a paragem 20 que ira ser colocada na posicao 3\n");
-      printf("Quanto terminar introduza :Sair:\n");
       while (flag == 1) {
+        printaparagens3(no);
+        printf("[Exemplo:20 3\n Escolheu a paragem 20 que ira ser colocada na posicao 3\n");
+        printf("Quanto terminar introduza :Sair:]\n");
+        printf("Introduza\n");
+        int flagseguranca = 0;
         while (getchar() != '\n');
         fflush(stdout);
         fgets(in, sizeof(in), stdin);
@@ -1072,6 +1198,7 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
         Upper(in);
         if (strcmp(in,"SAIR") == 0) {
           flag = 0;
+          break;
         }
         if (flag == 1) {
           sscanf(in, "%d %d", & parag, & posicao);
@@ -1080,6 +1207,18 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
 
           char * getc = getcodigo(paragens, getp);
           printf("\n%s %s\n", getp, getc);
+          for(int q = 0; q<linha->num_paragens; q++){
+
+          if(strcmp(linha->paragens[q],getp)==0){
+            flagseguranca = 1;
+            break;
+          }
+        }
+        if(flagseguranca == 1){
+          printf("A paragem que pretende adicionar ja se encontra presente na linha\n");
+          flag = 0;
+          continue;
+        }
           if (posicao == 0) {
             printf("iF Posicao %d\n",posicao);
             linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
@@ -1096,6 +1235,7 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
             strcpy(linha -> paragens[0], getp);
             strcpy(linha -> codigo[0], getc);
             linha -> num_paragens++;
+            continue;
           } else if (posicao == linha -> num_paragens) {
             printf("Else IF Posicao %d\n",posicao);
             linha -> paragens = realloc(linha -> paragens, (linha -> num_paragens + 1) * sizeof(char * ));
@@ -1105,6 +1245,7 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
             strcpy(linha -> paragens[linha -> num_paragens], getp);
             strcpy(linha -> codigo[linha -> num_paragens], getc);
             linha -> num_paragens++;
+            continue;
           } else {
             printf("Else Posicao %d\n",posicao);
             
@@ -1125,7 +1266,7 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
                 strcpy(linha -> paragens[posicao], getp);
                 strcpy(linha -> codigo[posicao], getc);
                 linha -> num_paragens++;
-                flag = 0;
+                continue;
               
             
           }
@@ -1145,6 +1286,7 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
       Upper(cod);
       if (strcmp(cod, "SAIR") == 0) {
         flag = 0;
+        break;
       }
       if (flag == 1) {
         for (int x = 0; x < linha -> num_paragens; x++) {
@@ -1187,6 +1329,282 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
 }
     
 }
+
+void printalinhas2(NoLinha *lista_linhas, Paragem *paragens){
+    int numero = 0, escolha, numeroP;
+    if(lista_linhas == NULL) {
+        printf("A lista de linhas esta vazia.\n");
+        return;
+    }
+    printf("Pretende visualizar linhas que passem em alguma paragem especifica?\n");
+    while(escolha != 1 && escolha != 2){
+    printf("1-->Sim\n2-->Nao\n");
+    scanf("%d",&escolha);
+    }
+    if(escolha == 2){
+      return;
+    }
+    else if(escolha == 1){
+      printaparagens4(paragens);
+      printf("Introduza o numero da paragem que pretende selecionar\n");
+      scanf("%d",&numeroP);
+      char * escolha = getparagem2(paragens,numeroP);
+      NoLinha *no = lista_linhas;
+    while(no != NULL){
+        Linha *linha = no->linha;
+        for(int y = 0; y < linha->num_paragens; y++){
+          if(strcmp(escolha,linha->paragens[y])==0){
+        printf("%d -> [-%s-]\n",numero,linha->nome);
+        break;
+          }
+      
+    } 
+      no =  no->prox;
+        numero++; 
+
+    }
+      
+    }
+    
+
+}
+
+void adicionar_linhaUinput(Sistema *sistema , Paragem *paragens, NoLinha *lista_linhas){
+    char nomedalinha[40],  paragem[40],  cod[7], templinha1[30],templinha2[30];
+    int quantidade,flagloop=1;
+    char *testelinha;
+    int flag = 1;
+    while(flagloop == 1){
+        int flags=0;
+    printf("Introduza o nome da linha (Nome: 'Linha Central')\n");
+    while (getchar() != '\n');
+        fflush(stdout);
+    fgets(nomedalinha, sizeof(nomedalinha), stdin);
+        // remove o caractere de nova linha
+        nomedalinha [strcspn(nomedalinha, "\n")] = '\0';
+    testelinha=strstr(nomedalinha,"Linha");
+    if (testelinha == NULL){
+        printf("O nome da linha tem de ser iniciado por 'Linha'\n");
+         printf("Introduza o nome da linha (Nome: 'Linha Central')\n");
+         while (getchar() != '\n');
+        fflush(stdout);
+        fgets(nomedalinha, sizeof(nomedalinha), stdin);
+        // remove o caractere de nova linha
+        nomedalinha [strcspn(nomedalinha, "\n")] = '\0';
+    }
+    printf("->:%s:\n",nomedalinha);
+    int indlinha= sistema->num_linhas;
+    --indlinha;
+     if (indlinha < 0 ) {
+        printf("Indice de linha invalido!\n");
+        return;
+    } 
+    
+   
+    for(int y = 0; y<sistema->num_linhas;y++){
+        Linha *linha = (&sistema->linhas[y]);
+         if ( linha == NULL) {
+        printf("Linha nao pode ser nula.\n");
+        return;
+    }
+        if( strcmp(nomedalinha,linha->nome)==0){
+            printf("Erro->O nome da linha ja existe!\n");
+            flags=1;
+            break;
+        }
+    
+    }
+    sistema->linhas = realloc(sistema->linhas, (sistema->num_linhas + 1) * sizeof(Linha));
+    Linha *linha = &sistema->linhas[sistema->num_linhas];
+    linha->nome = malloc(strlen(nomedalinha) + 1);
+    printf(" malloc nome done\n");
+    if (linha->nome == NULL){
+        printf("Erro a alocar memoria para o nome da linha\n");
+        return;
+    }
+    strcpy(linha->nome, nomedalinha);
+    linha->num_paragens = 0;
+    sistema->num_linhas++;
+    while(flag == 1){
+       flag = 1;
+      char in [30];
+      printaparagens4(paragens);
+      printf("Introduza o numero da paragem a adicionar\n");
+      
+        int parag;
+       
+        printf("Quanto terminar introduza :Sair:]\n");
+        printf("Introduza\n");
+        int flagseguranca = 0;
+        while (getchar() != '\n');
+        fflush(stdout);
+        fgets(in, sizeof(in), stdin);
+        // remove o caractere de nova linha
+        in [strcspn(in, "\n")] = '\0';
+        Upper(in);
+        if (strcmp(in,"SAIR") == 0) {
+          flag = 0;
+          flagloop = 0;
+          break;
+        }
+        if (flag == 1) {
+          sscanf(in, "%d %d", &parag);
+          //obtemparagem
+          char * getp = getparagem2(paragens, parag);
+
+          char * getc = getcodigo2(paragens, getp);
+          printf("\n%s %s\n", getp, getc);
+          for(int q = 0; q<linha->num_paragens; q++){
+
+          if(strcmp(linha->paragens[q],getp)==0){
+            flagseguranca = 1;
+            break;
+          }
+        }
+        if(flagseguranca == 1){
+          printf("A paragem que pretende adicionar ja se encontra presente na linha\n");
+          continue;
+        }
+      
+     if (linha->num_paragens == 0) {
+        linha->paragens = malloc(sizeof(char *));
+        if (linha->paragens == NULL) {
+            // erro ao alocar memória
+            printf("Erro ao alocar memoria\n");
+            exit(1);
+        }
+        linha->codigo = malloc(sizeof(char *));
+        if (linha->codigo == NULL) {
+            // erro ao alocar memória
+            printf("Erro ao alocar memoria\n");
+            exit(1);
+        }
+    }
+    // aloca mais um ponteiro para string no array de paragens
+    linha->paragens = realloc(linha->paragens, (linha->num_paragens + 1) * sizeof(char *));
+    if (linha->paragens == NULL) {
+        // erro ao alocar memória
+        exit(1);
+    }
+    linha->codigo = realloc(linha->codigo, (linha->num_paragens + 1) * sizeof(char *));
+    if (linha->codigo == NULL) {
+        // erro ao alocar memória
+        exit(1);
+    }
+    // aloca memória para a nova string com o nome da paragem
+    linha->paragens[linha->num_paragens] = malloc((strlen(getp) + 1) * sizeof(char));
+    if (linha->paragens[linha->num_paragens] == NULL) {
+        // erro ao alocar memória
+        exit(1);
+    }
+    // aloca memória para a nova string com o cod da paragem
+    linha->codigo[linha->num_paragens] = malloc((strlen(getc) + 1) * sizeof(char));
+    if (linha->paragens[linha->num_paragens] == NULL) {
+        // erro ao alocar memória
+        exit(1);
+    }
+    // copia o nome da paragem para a nova string
+    strcpy(linha->paragens[linha->num_paragens], getp);
+     // copia o cod da paragem para a nova string
+    strcpy(linha->codigo[linha->num_paragens], getc);
+    // atualiza o número de paragens da linha
+    linha->num_paragens++;
+    sistema->Snumparagens++;
+    }
+    
+
+
+}
+NoLinha *noatual = lista_linhas;
+while(noatual->prox!=NULL){
+noatual = noatual->prox;
+}
+NoLinha *novoNo = malloc(sizeof(NoLinha));
+novoNo->linha = linha;
+noatual->prox=novoNo;
+novoNo->prox=NULL;
+
+}
+    }
+
+    void guardarDadosEmArquivo(Sistema *sistema, Paragem *paragens) {
+      char ficheiro[20];
+      char *extensao;
+      int flag1 = 0;    
+    FILE *arquivo;
+       printf("Insere o nome do ficheiro para ler ('ficheiro.bin'):\n");
+    scanf("%s",ficheiro);
+    
+    
+    while (flag1 == 0){
+        extensao = strstr(ficheiro, ".bin");
+    if (extensao == NULL){
+        printf("Tem de inserir a extensao do arquivo ('.bin')\n");
+        printf("Insere o nome do ficheiro para ler ('ficheiro.bin'):\n");
+        scanf("%s",ficheiro);
+    }
+    else {
+        flag1 = 1;
+        
+    }
+    }
+   arquivo = fopen(ficheiro, "wb");
+  if (arquivo == NULL) {
+    printf("Erro ao abrir o arquivo para escrita.\n");
+    return;
+  }
+
+  // Escrever os dados das linhas
+  fwrite(sistema,sizeof(Sistema),1,arquivo);
+
+  // Escrever os dados da struct paragens
+  fwrite(paragens, sizeof(Paragem), 1, arquivo);
+
+  fclose(arquivo);
+}
+void restaurarDadosDoArquivo(Sistema **sistema, Paragem **paragens) {
+   char ficheiro[20];
+      char *extensao;
+      int flag1 = 0;
+       int sistema_tamanho, paragens_tamanho;    
+    FILE *arquivo;
+       printf("Insere o nome do ficheiro para ler ('ficheiro.bin'):\n");
+    scanf("%s",ficheiro);
+    
+    
+    while (flag1 == 0){
+        extensao = strstr(ficheiro, ".bin");
+    if (extensao == NULL){
+        printf("Tem de inserir a extensao do arquivo ('.bin')\n");
+        printf("Insere o nome do ficheiro para ler ('ficheiro.bin'):\n");
+        scanf("%s",ficheiro);
+    }
+    else {
+        flag1 = 1;
+        
+    }
+    }
+
+  arquivo = fopen(ficheiro, "rb");
+  if (arquivo == NULL) {
+    printf("Erro ao abrir o arquivo para leitura.\n");
+    return;
+  }
+  fread(&sistema_tamanho, sizeof(int), 1, arquivo);
+  fread(&paragens_tamanho, sizeof(int), 1, arquivo);
+   *sistema = realloc(*sistema,sistema_tamanho * sizeof(Sistema));
+   *paragens = realloc(*paragens,paragens_tamanho * sizeof(Paragem) );
+
+  // Ler os dados das linhas
+  fread(*sistema,sizeof(Sistema), sistema_tamanho , arquivo);
+
+  // Ler os dados da struct paragens
+  fread(*paragens, sizeof(Paragem), paragens_tamanho, arquivo);
+
+  fclose(arquivo);
+}
+
+
    void libertar_sistema(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas) {
      NoLinha *atual = lista_linhas;
     while (atual != NULL) {
@@ -1226,7 +1644,7 @@ void atualizarlinha(Sistema * sistema, NoLinha * lista_linhas, Paragem * paragen
 
 
 int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
-    int opcao;
+    int opcao, opcao2 = 3;
     printf("---Menu---\n");
     printf("1-->Registar Paragem\n");
     printf("2-->Elimar Paragem\n");
@@ -1253,7 +1671,17 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
                   break;
       case 4:
          printf("Opcao 4 selecionada\n");
-         adicionalinhadoc(sistema, paragens);
+         while(opcao2 != 1 && opcao2 != 2){
+         printf("1--introduzir informacao\n 2--Ficheiro Txt\n");
+         scanf("%d",&opcao2);
+         }
+         if(opcao2==1){
+         adicionar_linhaUinput(sistema,paragens,lista_linhas);
+         }
+         else{
+         adicionalinhadoc2(sistema, paragens,lista_linhas);
+         //adicionarNO(lista_linhas,sistema);
+         }
          break;
       case 5:
          printf("Opcao 5 selecionada\n");
@@ -1262,6 +1690,7 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
       case 6:
          printf("Opcao 6 selecionada\n");
          printalinhas(lista_linhas);
+         printalinhas2(lista_linhas,paragens);
          break;
       case 7:
          printf("Opcao 7 selecionada\n");
@@ -1300,6 +1729,7 @@ int menu(Sistema *sistema, Paragem *paragens, NoLinha *lista_linhas){
          break;
       case 8:
             printf("Opcao 8 selecionada\n");
+            guardarDadosEmArquivo(sistema,paragens);
             libertar_sistema(sistema, paragens, lista_linhas);
             printf("Adeus!\n");
             flag2=0;

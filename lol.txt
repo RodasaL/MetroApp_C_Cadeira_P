@@ -1,0 +1,40 @@
+Linha numero1
+Parque do Roubo2 #L3311
+Paragem Fim2 #H1231
+Viaduto2 #P0031
+Paragem2 #J9731
+Flores2 #A5441
+Loja do Cidadao2 #P0131
+Zona Alta2 #V4231
+Aviario2 #I2211
+
+Linha da numero2
+Parque da Cidade2 #P0111
+Portagem2 #P091
+Flores2 #A5441
+Aviario2 #I2211
+Loja do Cidadao2 #P0131
+Casa do Sal2 #F5541
+Casa do Mel2 #F5141
+Paragem Fim2 #H1231
+Coimbra-B #H123
+
+Linha numero3
+Parque do Roubo23 #L3311
+Paragem Fim23 #H2231
+Viaduto25 #P5031
+Paragem232 #J2731
+Flores22 #A5141
+Loja do Cidadao21 #P015
+Zona Alta27 #V41
+Aviario2d #F2345
+
+Linha numero4
+Parque do Roubo23 #L3311
+Paragem Fim23 #H2231
+Viaduto25 #P5031
+Paragem232 #J2731
+Flores22 #A5141
+Loja do Cidadao21 #P015
+Zona Alta27 #V41
+Aviario2d #F2345

@@ -1,5 +1,10 @@
-Linha nada
-paragem0 #Z000
+Linha Inicial
+Inicio #Z000
+Alexandre Norte #Y3668
+Daniel Avenida #P8245
+Alvalade #Q7826
+Roma #B7398
+Campolide #D7296
 
 Linha Secundaria
 Parque da Cidade2 #P000
@@ -32,3 +37,22 @@ Casa do Mel #F514
 Paragem Fim #H123
 Coimbra-B #H123
 
+Linha Odivelas
+Odivelas #Y6921
+Senhor Roubado #O7192
+Oriente #W6877
+Campo Grande #A5414 
+Intendente #T7289
+Anjos #W8966
+Praca da Espanha #H2375
+
+Linha Campolide
+Rossio #S3948 
+Martim Moniz #T9744
+Baixa-Chiado #J6135
+Terreiro do Paco #R2166 
+Santa Apolonia #J8874
+Avenida #Q6462
+Picoas #P6985
+Sete Rios #Y5331
+Alto dos Moinhos #U2884
