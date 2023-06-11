@@ -7,7 +7,7 @@ Roma #B7398
 Campolide #D7296
 
 Linha Secundaria
-Parque da Cidade2 #P000
+Parque das Flores #P000
 Ponte #P03
 Viaduto #P003
 Ferrovia #P073
@@ -17,7 +17,7 @@ Coimbra-D #Z1323
 Paragem Fim #H123
 
 Linha Alta
-Parque do Roubo #L331
+Parque Verde #L331
 Paragem Fim #H123
 Viaduto #P003
 Paragem #J973
@@ -55,4 +55,4 @@ Santa Apolonia #J8874
 Avenida #Q6462
 Picoas #P6985
 Sete Rios #Y5331
-Alto dos Moinhos #U2884
+Alto dos Moinhos #G2884

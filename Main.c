@@ -1,3 +1,5 @@
+//@Rodrigo Dinis Lourenço 2021155662
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,6 +30,7 @@ int main() {
      paragens->num_paragensp =0;
      sistema->num_linhas = 0;
      sistema->Snumparagens = 0;
+     printf("   --Bem Vindo--  \n [Projeto Metro Mondego]\n");
      while(opcao2 != 1 && opcao2 != 2){
      printf("Pretende inicializar a partir um ficheiro: 1-->txt\nPretende restaurar a partir de um ficheiro 2-->bin\n");
      scanf("%d",&opcao2);
